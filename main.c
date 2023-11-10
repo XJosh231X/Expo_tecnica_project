@@ -23,8 +23,8 @@ int IN3 = 8;
 int IN4 = 9;
 int ENB = 10;
 int speed; // variable para almacenar valor de velocidad
-int vMotor1 = 255;
-int vMotor2 = 255;
+int vMotor1 = 150;
+int vMotor2 = 150;
 int counter = 0;
 int counterDisplay = 0;
 LiquidCrystal_I2C lcd(0x27, 16, 2);
@@ -75,7 +75,7 @@ void start()
         motorHigh(2);                     // se enciende el motor 2
         do{                             //se inicia este ciclo que almacena el contador presente en el display
           count();
-        } while(counter<5); //count==5
+        } while(counter<4); //count==5
         motorLow(2);
         delay(500);
         endingInstruction();
@@ -126,7 +126,7 @@ int metalDec(int x) {
 void motorHigh(int c){ 
   if(c == 1)
   {
-    digitalWrite(ENA, HIGH);
+    analogWrite(ENA, vMotor1);
     digitalWrite(IN1, LOW);
     digitalWrite(IN2, HIGH);
   }
@@ -159,7 +159,7 @@ void endingCounter()
         lcd.print("PR:");
         lcd.setCursor(4, 1);
         lcd.print(counter);
-    } while (opticS2 == 5);
+    } while (opticS2 == 4);
 }
 //---------------------------------------------
 void endingInstruction()
