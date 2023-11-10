@@ -1,19 +1,18 @@
-#include <arduino.h>
 #include <Servo.h>
 #include <LiquidCrystal_I2C.h>
 int opticS1 = 4;
 int opticS2 = 7;
 int sda = A4;
 int scl = A5;
-int fdcInicial = 1; // fin de carrera inicial
-int fdcFinal = 0; // fin de carrera final
+int fdcInicial = 12; // fin de carrera inicial
+int fdcFinal = 13; // fin de carrera final
 int decMetal = 6;
 //int counter;
 int lcDisplay;
 // servo
 Servo myServo;
 int servoPin = 11;
-int servoPos = 90;
+int servoPos = 160;
 int servoDelay = 10000;
 // motor1
 int IN1 = 2; // IN1 de L298N a pin digital 2
@@ -27,9 +26,10 @@ int speed; // variable para almacenar valor de velocidad
 int vMotor1 = 255;
 int vMotor2 = 255;
 int counter = 0;
+int counterDisplay = 0;
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
-int main()
+void setup()
 {
     // setup
     pinMode(opticS1, INPUT);
@@ -48,28 +48,36 @@ int main()
     lcd.backlight();
     lcd.clear();
     myServo.attach(servoPin);
-while (true)
+}
+void loop()
 {
     start();
+    
 }
-}
+
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void start()
 {
   int valor1;
-    if (digitalRead(fdcInicial) == 1) { //si el fin de carrera inicial esta activado
+    if (digitalRead(fdcInicial) != 0) { //si el fin de carrera inicial esta activado
+        lcd.setCursor(0, 0);
+        lcd.print("ENCENDIDO!!");
+        lcd.setCursor(0, 1);
+        lcd.print("EN PROCESO!!!");
+        lcd.setCursor(14,1);
+        lcd.print(counter);
         motorHigh(1);                     //se enciende el motor 1
         do{                               //Este ciclo while lee el sensor optico y almacena esa lectura en la variable "valor1"
             valor1 = digitalRead(opticS1);
         } while(valor1==0);             // se sale del bucle cuando la lectura da 1
         motorLow(1);                    //motorLow(1) apaga el motor 1
+        delay(2000);                    
         motorHigh(2);                     // se enciende el motor 2
         do{                             //se inicia este ciclo que almacena el contador presente en el display
           count();
         } while(counter<5); //count==5
-        motorLow(2);                     //se apaga el motor 2
-        endingCounter();                    
-        motorHigh(1);
+        motorLow(2);
+        delay(500);
         endingInstruction();
         }
 }
@@ -78,14 +86,30 @@ void start()
 
 void count(){
     int valor = digitalRead(opticS2);
-    if (valor == 1 && metalDec(digitalRead(decMetal)) == 0) {
-            counter++;
-        }
+    
+    if (valor != 0) { //&& digitalRead(decMetal) == 0
+      lcd.clear();
+      counter++;
+      counterDisplay++;
+      lcd.setCursor(0, 0);
+      lcd.print("==>ENCENDIDO!<==");
+      lcd.setCursor(0, 1);
+      lcd.print("PR:");
+      lcd.setCursor(4, 1);
+      lcd.print(counter);
+      delay(1000);
+      //endingCounter();
+    } /*
+        else if (valor != 0)// && digitalRead(decMetal) != 0
+        {
+            metalDec(1);
+            myServo.write(0);
+        }*/
 }
 
 int metalDec(int x) {
     int devuelve = 0;
-
+    lcd.clear();
     if (x == 1) {
         // Se detecto metal proceso detenido
         lcd.setCursor(0, 0);
@@ -115,7 +139,7 @@ void motorHigh(int c){
 }
 //------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void motorLow(int motor) {
-    if(motor = 1){
+    if(motor == 1){
       digitalWrite(ENA,LOW);  //int ifD = ENA; //Apagamos motor 1
     } else {
         digitalWrite(ENB,LOW); // apagamos motor 2
@@ -141,8 +165,16 @@ void endingCounter()
 void endingInstruction()
 {
     do
-    {
-        digitalRead(fdcFinal);
-    } while (fdcFinal == 0);
+    {   
+        motorHigh(1); 
+    } while (digitalRead(fdcFinal) == 0);
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("EN ESPERA...");
+    lcd.setCursor(0, 1);
+    lcd.print("CR:");
+    lcd.setCursor(4, 1);
+    lcd.print(counterDisplay);
     motorLow(1);
+    counter = 0;
 }
