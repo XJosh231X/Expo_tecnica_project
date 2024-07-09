@@ -6,14 +6,13 @@ int sda = A4;
 int scl = A5;
 int fdcInicial = 12; // fin de carrera inicial
 int fdcFinal = 13; // fin de carrera final
-int decMetal = 6;
-//int counter;
+//int decMetal = 6;
 int lcDisplay;
-// servo
+/* servo
 Servo myServo;
 int servoPin = 11;
 int servoPos = 160;
-int servoDelay = 10000;
+int servoDelay = 10000;*/
 // motor1
 int IN1 = 2; // IN1 de L298N a pin digital 2
 int IN2 = 3; // IN2 de L298N a pin digital 3
@@ -107,7 +106,7 @@ void count(){
         }*/
 }
 
-int metalDec(int x) {
+/*int metalDec(int x) {
     int devuelve = 0;
     lcd.clear();
     if (x == 1) {
@@ -121,7 +120,7 @@ int metalDec(int x) {
         devuelve=1;
     } 
     return devuelve;
-}
+}*/
 
 void motorHigh(int c){ 
   if(c == 1)
