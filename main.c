@@ -8,8 +8,8 @@ int fdcInicial = 12; // fin de carrera inicial
 int fdcFinal = 13; // fin de carrera final
 //int decMetal = 6;
 int lcDisplay;
-/* servo
-Servo myServo;
+// servo
+/*Servo myServo;
 int servoPin = 11;
 int servoPos = 160;
 int servoDelay = 10000;*/
@@ -24,7 +24,7 @@ int ENB = 10;
 int speed; // variable para almacenar valor de velocidad
 int vMotor1 = 150;
 int vMotor2 = 150;
-int counter = 0;
+int counter = 0; 
 int counterDisplay = 0;
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
@@ -50,8 +50,7 @@ void setup()
 }
 void loop()
 {
-    start();
-    
+    start();    
 }
 
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -65,17 +64,17 @@ void start()
         lcd.print("EN PROCESO!!!");
         lcd.setCursor(14,1);
         lcd.print(counter);
-        motorHigh(1);                     //se enciende el motor 1
+        motorHigh(2);                     //se enciende el motor 1
         do{                               //Este ciclo while lee el sensor optico y almacena esa lectura en la variable "valor1"
             valor1 = digitalRead(opticS1);
         } while(valor1==0);             // se sale del bucle cuando la lectura da 1
-        motorLow(1);                    //motorLow(1) apaga el motor 1
+        motorLow(2);                    //motorLow(1) apaga el motor 1
         delay(2000);                    
-        motorHigh(2);                     // se enciende el motor 2
+        motorHigh(1);                     // se enciende el motor 2
         do{                             //se inicia este ciclo que almacena el contador presente en el display
           count();
-        } while(counter<4); //count==5
-        motorLow(2);
+        } while(counter<5); //count==5
+        motorLow(1);
         delay(500);
         endingInstruction();
         }
@@ -125,7 +124,7 @@ void count(){
 void motorHigh(int c){ 
   if(c == 1)
   {
-    analogWrite(ENA, vMotor1);
+    analogWrite(ENA, vMotor1); //modificación de velocidad
     digitalWrite(IN1, LOW);
     digitalWrite(IN2, HIGH);
   }
@@ -151,29 +150,32 @@ void endingCounter()
     do
     {
         lcDisplay = opticS2;
-        // mostrar por pantalla el cÃ³nteo
+        // mostrar por pantalla el conteo
         lcd.setCursor(0, 0);
         lcd.print("==>ENCENDIDO!<==");
         lcd.setCursor(0, 1);
         lcd.print("PR:");
         lcd.setCursor(4, 1);
         lcd.print(counter);
-    } while (opticS2 == 4);
+    } while (opticS2 == 5);
 }
 //---------------------------------------------
 void endingInstruction()
 {
-    do
+    motorHigh(2);
+    delay(750); //delay fin de carrera final
+    /*do
     {   
-        motorHigh(1); 
-    } while (digitalRead(fdcFinal) == 0);
+        motorHigh(1);
+     
+    } while (digitalRead(fdcFinal) == 0);*/
     lcd.clear();
     lcd.setCursor(0, 0);
     lcd.print("EN ESPERA...");
     lcd.setCursor(0, 1);
-    lcd.print("CR:");
+    lcd.print("CR:"); //CONTEOS REALIZADOS TOTALES  
     lcd.setCursor(4, 1);
-    lcd.print(counterDisplay);
-    motorLow(1);
+    lcd.print(counterDisplay); //conteo total continuo
+    motorLow(2);
     counter = 0;
 }
